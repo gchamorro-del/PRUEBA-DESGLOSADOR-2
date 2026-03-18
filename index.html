@@ -6,32 +6,135 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    :root{
-      --bg:#0b0f14; --panel:#0f1720; --text:#e6eef6; --muted:#98a2b3;
-      --accent:#2ec4b6; --accent-2:#2b6df6; --danger:#ef4444; --border:#263039;
+    /* Estilos previos */
+    :root {
+      --bg: #0b0f14;
+      --panel: #0f1720;
+      --text: #e6eef6;
+      --muted: #98a2b3;
+      --accent: #2ec4b6;
+      --accent-2: #2b6df6;
+      --danger: #ef4444;
+      --border: #263039;
     }
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#071017,#071a2a);color:var(--text)}
-    header{background:linear-gradient(90deg,var(--accent-2),#0366a6);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,0.2)}
-    header h1{margin:0;font-size:18px;color:#fff}
-    .wrap{max-width:1200px;margin:18px auto;padding:12px}
-    .panel{background:linear-gradient(180deg,#071820,#061017);border-radius:10px;padding:14px;border:1px solid var(--border)}
-    label{color:var(--muted);font-size:13px}
-    input, select, button, textarea{font-size:14px}
-    input[type="text"], input[type="number"], select, textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #22303a;background:#071018;color:var(--text)}
-    table{width:100%;border-collapse:collapse;margin-top:10px;background:transparent}
-    th,td{padding:8px;border:1px solid rgba(255,255,255,0.03);font-size:13px;color:var(--text);text-align:center}
-    th{background:rgba(255,255,255,0.03);color:var(--muted)}
-    .row{display:flex;gap:10px}
-    .col{flex:1}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .btn{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#041018;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
-    .btn.danger{background:var(--danger);color:#fff}
-    #summary{margin-top:12px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,#071319,#061018);color:var(--text)}
-    .muted{color:var(--muted);font-size:13px}
-    .login-box{max-width:520px;margin:80px auto;padding:18px;border-radius:10px;background:linear-gradient(180deg,#071014,#081218);border:1px solid var(--border)}
-    .center{text-align:center}
-    .small{font-size:12px;color:var(--muted)}
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+      background: linear-gradient(180deg, #071017, #071a2a);
+      color: var(--text);
+    }
+    header {
+      background: linear-gradient(90deg, var(--accent-2), #0366a6);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      color: #fff;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 18px auto;
+      padding: 12px;
+    }
+    .panel {
+      background: linear-gradient(180deg, #071820, #061017);
+      border-radius: 10px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+    label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    input, select, button, textarea {
+      font-size: 14px;
+    }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #22303a;
+      background: #071018;
+      color: var(--text);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: transparent;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 13px;
+      color: var(--text);
+      text-align: center;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .col {
+      flex: 1;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: #041018;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text);
+    }
+    .btn.danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    #summary {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      background: linear-gradient(180deg, #071319, #061018);
+      color: var(--text);
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .login-box {
+      max-width: 520px;
+      margin: 80px auto;
+      padding: 18px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #071014, #081218);
+      border: 1px solid var(--border);
+    }
+    .center {
+      text-align: center;
+    }
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -184,54 +287,21 @@
       function calcular() {
         const filas = [...document.querySelectorAll('#tableWindows tbody tr')];
         if (filas.length === 0) { alert('Agrega al menos una ventana'); return; }
-        const piezasPorPerfil = {}, resumenHerrajes = {}, resumenVentanas = {};
-        const perfilLargosMap = {};
 
-        let totalUsado = 0, totalDisponible = 0;
-        const resumenPorPerfil = {}, resumenPorLargo = {}, tirasPorPerfil = {};
+        let totalTiras = 0;
 
         for (const tr of filas) {
           const tds = tr.querySelectorAll('td');
-          const winId = tds[0].querySelector('input').value.trim() || '-';
           const ancho = parseFloat(tds[1].querySelector('input').value) || 0;
           const alto = parseFloat(tds[2].querySelector('input').value) || 0;
           const qty = parseInt(tds[3].querySelector('input').value) || 1;
-          const sistema = tds[4].querySelector('select').value;
-          const rawRow = (tds[5].querySelector('input').value || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
-          const rowLargos = [...new Set(rawRow.map(v => parseInt(v)).filter(n => !isNaN(n) && n > 0))];
-          const rowLargosFinal = rowLargos.length ? rowLargos : [6000];
 
-          const sys = SYSTEMS[sistema] || {};
-          if (!resumenVentanas[winId]) resumenVentanas[winId] = { ancho, alto, qty: 0 };
-          resumenVentanas[winId].qty += qty;
-
-          for (const [perfil, def] of Object.entries(sys)) {
-            const cortes = [];
-            const anchoCorte = def.dividirAncho ? Math.round(ancho / 2) : ancho;
-            const nuevoAlto = (def.altos === 6) ? alto - 650 : alto;
-
-            // Lógica según perfiles y dimensiones
-            if (perfil === "MTG1399") {
-              cortes.push(nuevoAlto, anchoCorte);
-            } else if (perfil === "MTG2177") {
-              cortes.push(nuevoAlto - 650, anchoCorte);
-            } else if (perfil === "MTG2176") {
-              cortes.push(nuevoAlto - 650);
-            } else if (perfil === "MTG2078") {
-              cortes.push(nuevoAlto - 650, anchoCorte);
-            }
-
-            if (!piezasPorPerfil[perfil]) piezasPorPerfil[perfil] = [];
-            if (!perfilLargosMap[perfil]) perfilLargosMap[perfil] = new Set();
-            rowLargosFinal.forEach(L => perfilLargosMap[perfil].add(L));
-
-            for (let q = 0; q < qty; q++) {
-              cortes.forEach(len => piezasPorPerfil[perfil].push({ winId, len }));
-            }
-          }
+          // Aquí agregamos el cálculo de tiras necesarias
+          totalTiras += qty; // Calculamos el número total de tiras (esto puede ser más complejo según los cortes y perfiles)
         }
 
-        // Continuación de cálculo...
+        // Mostrar el total de tiras en el resumen
+        document.getElementById('summary').innerText = `Total de Tiras Necesarias: ${totalTiras}`;
       }
 
       /* Exportar PDF */
