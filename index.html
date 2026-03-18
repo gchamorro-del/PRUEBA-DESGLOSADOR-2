@@ -141,8 +141,8 @@
       const SYSTEMS = {
         "Ventana Corrediza Europea 3V (2 Hojas + Cedazo)": {
           "MTG1399": { altos: 2, anchos: 2 },
-          "MTG2177": { altos: 6, anchos: 6, dividirAncho: true },
-          "MTG2176": { altos: 4, anchos: 0 },
+          "MTG2177": { altos: 4, anchos: 6, dividirAncho: true },
+          "MTG2176": { altos: 2, anchos: 0 },
           "MTG2078": { altos: 2, anchos: 2, dividirAncho: true }
         }
       };
@@ -236,12 +236,18 @@
 
       /* Exportar PDF */
       function exportPdf() {
-        // Función para exportar el PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text('Reporte de Cortes', 20, 20);
+        doc.save('reporte.pdf');
       }
 
       /* Borrar todo */
       function borrarTodo() {
-        // Función para borrar todos los datos
+        document.querySelector('#tableWindows tbody').innerHTML = '';
+        document.querySelector('#tableProfiles tbody').innerHTML = '';
+        lastResults = null;
+        document.getElementById('summary').innerText = 'Presiona "Calcular resumen" para ver totales por perfil.';
       }
 
       window.addRow = addRow;
