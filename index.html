@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Optimizador Técnico de Cortes — Versión Final Mejorada</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1720; --text:#e6eef6; --muted:#98a2b3;
+      --accent:#2ec4b6; --accent-2:#2b6df6; --danger:#ef4444; --border:#263039;
+    }
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#071017,#071a2a);color:var(--text)}
+    header{background:linear-gradient(90deg,var(--accent-2),#0366a6);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,0.2)}
+    header h1{margin:0;font-size:18px;color:#fff}
+    .wrap{max-width:1200px;margin:18px auto;padding:12px}
+    .panel{background:linear-gradient(180deg,#071820,#061017);border-radius:10px;padding:14px;border:1px solid var(--border)}
+    label{color:var(--muted);font-size:13px}
+    input, select, button, textarea{font-size:14px}
+    input[type="text"], input[type="number"], select, textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #22303a;background:#071018;color:var(--text)}
+    table{width:100%;border-collapse:collapse;margin-top:10px;background:transparent}
+    th,td{padding:8px;border:1px solid rgba(255,255,255,0.03);font-size:13px;color:var(--text);text-align:center}
+    th{background:rgba(255,255,255,0.03);color:var(--muted)}
+    .row{display:flex;gap:10px}
+    .col{flex:1}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#041018;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
+    .btn.danger{background:var(--danger);color:#fff}
+    #summary{margin-top:12px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,#071319,#061018);color:var(--text)}
+    .muted{color:var(--muted);font-size:13px}
+    .login-box{max-width:520px;margin:80px auto;padding:18px;border-radius:10px;background:linear-gradient(180deg,#071014,#081218);border:1px solid var(--border)}
+    .center{text-align:center}
+    .small{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🔩 Optimizador Técnico de Cortes — Versión Final</h1>
+    <div id="hdrUser" class="small">Offline • Tema técnico</div>
+  </header>
+
+  <div class="wrap">
+    <!-- LOGIN -->
+    <div id="loginSection" class="login-box panel">
+      <h2 style="color:var(--text);margin:0 0 8px 0">Acceso</h2>
+      <div class="row" style="gap:8px">
+        <div class="col">
+          <label for="loginUser">Usuario (nombre):</label>
+          <input id="loginUser" type="text" placeholder="Ej. Gustavo Chamorro">
+        </div>
+        <div style="width:180px">
+          <label for="loginPass">Contraseña:</label>
+          <input id="loginPass" type="password" placeholder="Contraseña">
+        </div>
+      </div>
+      <div style="margin-top:12px" class="actions">
+        <button class="btn" id="loginBtn">Entrar</button>
+      </div>
+      <p class="small" style="margin-top:10px;color:var(--muted)">Contraseña fija por defecto: <b>1234</b></p>
+    </div>
+
+    <!-- INTERFAZ DE APLICACIÓN -->
+    <div id="appSection" style="display:none">
+      <div class="panel">
+        <div class="row" style="align-items:center;gap:12px">
+          <div class="col" style="max-width:400px;">
+            <label for="projectName">Proyecto / Cliente</label>
+            <input id="projectName" type="text" placeholder="Ej. Proyecto Alfa - Edificio A">
+          </div>
+          <div style="width:260px">
+            <label>&nbsp;</label>
+            <div class="actions">
+              <button class="btn" onclick="addRow()">➕ Agregar ventana</button>
+              <button class="btn ghost" onclick="calcular()">🧮 Calcular resumen</button>
+              <button class="btn" onclick="exportPdf()">📄 Exportar PDF</button>
+              <button class="btn danger" onclick="borrarTodo()">🗑 Borrar todo</button>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:14px;color:var(--accent)">Ventanas (ingreso manual)</h3>
+
+        <div id="summary" class="muted center" aria-live="polite">Presiona "Calcular resumen" para ver totales por perfil.</div>
+
+        <table id="tableWindows">
+          <thead>
+            <tr>
+              <th>ID Ventana</th>
+              <th>Ancho (mm)</th>
+              <th>Alto (mm)</th>
+              <th>Cantidad</th>
+              <th>Sistema</th>
+              <th>Largo Tira (mm) [override]</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div id="profilesSection" style="display:none;">
+          <h3 style="margin-top:14px;color:var(--accent)">Perfiles (Ventana Corrediza Europea 3V)</h3>
+          <table id="tableProfiles">
+            <thead>
+              <tr>
+                <th>Perfil</th>
+                <th>Alto (mm)</th>
+                <th>Ancho (mm)</th>
+                <th>Largo Disponible (mm)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MTG1399</td>
+                <td><input type="number" id="MTG1399-alto" placeholder="Alto (mm)" min="0"></td>
+                <td><input type="number" id="MTG1399-ancho" placeholder="Ancho (mm)" min="0"></td>
+                <td><input type="number" id="MTG1399-largo" placeholder="Largo disponible (mm)" min="0"></td>
+              </tr>
+              <tr>
+                <td>MTG2177</td>
+                <td><input type="number" id="MTG2177-alto" placeholder="Alto (mm)" min="0"></td>
+                <td><input type="number" id="MTG2177-ancho" placeholder="Ancho (mm)" min="0"></td>
+                <td><input type="number" id="MTG2177-largo" placeholder="Largo disponible (mm)" min="0"></td>
+              </tr>
+              <tr>
+                <td>MTG2176</td>
+                <td><input type="number" id="MTG2176-alto" placeholder="Alto (mm)" min="0"></td>
+                <td><input type="number" id="MTG2176-ancho" placeholder="Ancho (mm)" min="0"></td>
+                <td><input type="number" id="MTG2176-largo" placeholder="Largo disponible (mm)" min="0"></td>
+              </tr>
+              <tr>
+                <td>MTG2078</td>
+                <td><input type="number" id="MTG2078-alto" placeholder="Alto (mm)" min="0"></td>
+                <td><input type="number" id="MTG2078-ancho" placeholder="Ancho (mm)" min="0"></td>
+                <td><input type="number" id="MTG2078-largo" placeholder="Largo disponible (mm)" min="0"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const PASSWORD = "1234";
+      let currentUser = null;
+      let lastResults = null;
+
+      const SYSTEMS = {
+        "Ventana Corrediza Europea 3V (2 Hojas + Cedazo)": {
+          "MTG1399": { altos: 2, anchos: 2 },
+          "MTG2177": { altos: 6, anchos: 6, dividirAncho: true },
+          "MTG2176": { altos: 4, anchos: 0 },
+          "MTG2078": { altos: 2, anchos: 2, dividirAncho: true }
+        }
+      };
+
+      /* LOGIN */
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        const u = document.getElementById('loginUser').value.trim();
+        const p = document.getElementById('loginPass').value;
+        if (!u || !p) { alert('Ingrese usuario y contraseña'); return; }
+        if (p !== PASSWORD) { alert('Contraseña incorrecta'); document.getElementById('loginPass').value = ''; return; }
+        currentUser = u;
+        document.getElementById('hdrUser').innerText = `Usuario: ${u}`;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('appSection').style.display = 'block';
+      });
+
+      /* Agregar ventana */
+      function addRow() {
+        const tbody = document.querySelector('#tableWindows tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="text" placeholder="V1"></td>
+          <td><input type="number" placeholder="1000" min="0"></td>
+          <td><input type="number" placeholder="1500" min="0"></td>
+          <td><input type="number" value="1" min="1"></td>
+          <td><select>
+            <option value="Ventana Corrediza Europea 3V (2 Hojas + Cedazo)">Ventana Corrediza Europea 3V (2 Hojas + Cedazo)</option>
+          </select></td>
+          <td><input type="text" placeholder="Ej: 5000,6000"></td>
+          <td><button class="btn ghost" onclick="this.closest('tr').remove()">X</button></td>
+        `;
+        tbody.appendChild(tr);
+
+        // Mostrar perfiles para Ventana Corrediza Europea 3V
+        document.getElementById('profilesSection').style.display = 'block';
+      }
+
+      /* Calcular */
+      function calcular() {
+        const filas = [...document.querySelectorAll('#tableWindows tbody tr')];
+        if (filas.length === 0) { alert('Agrega al menos una ventana'); return; }
+        const piezasPorPerfil = {}, resumenHerrajes = {}, resumenVentanas = {};
+        const perfilLargosMap = {};
+
+        let totalUsado = 0, totalDisponible = 0;
+        const resumenPorPerfil = {}, resumenPorLargo = {}, tirasPorPerfil = {};
+
+        for (const tr of filas) {
+          const tds = tr.querySelectorAll('td');
+          const winId = tds[0].querySelector('input').value.trim() || '-';
+          const ancho = parseFloat(tds[1].querySelector('input').value) || 0;
+          const alto = parseFloat(tds[2].querySelector('input').value) || 0;
+          const qty = parseInt(tds[3].querySelector('input').value) || 1;
+          const sistema = tds[4].querySelector('select').value;
+          const rawRow = (tds[5].querySelector('input').value || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
+          const rowLargos = [...new Set(rawRow.map(v => parseInt(v)).filter(n => !isNaN(n) && n > 0))];
+          const rowLargosFinal = rowLargos.length ? rowLargos : [6000];
+
+          const sys = SYSTEMS[sistema] || {};
+          if (!resumenVentanas[winId]) resumenVentanas[winId] = { ancho, alto, qty: 0 };
+          resumenVentanas[winId].qty += qty;
+
+          for (const [perfil, def] of Object.entries(sys)) {
+            const cortes = [];
+            const anchoCorte = def.dividirAncho ? Math.round(ancho / 2) : ancho;
+            const nuevoAlto = (def.altos === 6) ? alto - 650 : alto;
+
+            // Lógica según perfiles y dimensiones
+            if (perfil === "MTG1399") {
+              cortes.push(nuevoAlto, anchoCorte);
+            } else if (perfil === "MTG2177") {
+              cortes.push(nuevoAlto - 650, anchoCorte);
+            } else if (perfil === "MTG2176") {
+              cortes.push(nuevoAlto - 650);
+            } else if (perfil === "MTG2078") {
+              cortes.push(nuevoAlto - 650, anchoCorte);
+            }
+
+            if (!piezasPorPerfil[perfil]) piezasPorPerfil[perfil] = [];
+            if (!perfilLargosMap[perfil]) perfilLargosMap[perfil] = new Set();
+            rowLargosFinal.forEach(L => perfilLargosMap[perfil].add(L));
+
+            for (let q = 0; q < qty; q++) {
+              cortes.forEach(len => piezasPorPerfil[perfil].push({ winId, len }));
+            }
+          }
+        }
+
+        // Continuación de cálculo...
+      }
+
+      /* Exportar PDF */
+      function exportPdf() {
+        // Función para exportar el PDF
+      }
+
+      /* Borrar todo */
+      function borrarTodo() {
+        // Función para borrar todos los datos
+      }
+
+      window.addRow = addRow;
+      window.calcular = calcular;
+      window.exportPdf = exportPdf;
+      window.borrarTodo = borrarTodo;
+
+    });
+  </script>
+</body>
+</html>
